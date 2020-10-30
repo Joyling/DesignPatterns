@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>command</title>
+</head>
+
+<body>
+  <!-- <button>点击我ececute命令</button>
+ <button>点击我undo命令</button> -->
+  <button id="button1">button1</button>
+  <button id="button2">button2</button>
+  <button id="button3">button3</button>
+
+</body>
+<script>
+  var button1 = document.getElementById('button1');
+  var button2 = document.getElementById('button2');
+  var button3 = document.getElementById('button3');
+  // 往按钮上安装命令
+  var setCommand = function(button, command) {
+    button.onclick = function() {
+      command.execute();
+    }
+  }
+
+  // 行为
+  var MenuBar = {
+    refresh: function() {
+      console.log('刷新菜单目录')
+    }
+  };
+  var SubMenu = {
+    add: function() {
+      console.log('增加子菜单')
+    },
+    del: function() {
+      console.log('删除子菜单')
+    }
+  }
+
+  // 将行为封装在命令中
+  // 命令对象1 - 刷新菜单
+  var RefreshMenuBarCommand = function(receiver) {
+    this.receiver = receiver;
+  }
+  RefreshMenuBarCommand.prototype.execute = function() {
+    this.receiver.refresh();
+  }
+  // 命令对象2 - 增加子菜单
+  var AddSubMenuCommand = function(receiver) {
+    this.receiver = receiver;
+  }
+  AddSubMenuCommand.prototype.execute = function() {
+    this.receiver.add();
+  }
+  // 命令对象3 - 删除子菜单
+  var DelSumMenuCommand = function(receiver) {
+    this.receiver = receiver;
+  }
+  DelSumMenuCommand.prototype.execute = function() {
+    this.receiver.del();
+  }
+
+  // 1.将命令接收者传入command对象
+  var refreshMenuBarComman = new RefreshMenuBarCommand(MenuBar);
+  // 2.将命令安装在button中
+  setCommand(button1, refreshMenuBarComman)
+
+
+
+  // ***************闭包方式实现命令模式*********************
+
+    // // 请求的接收者
+    // var Tv = {
+    //   // 请求的操作
+    //   open: function () {
+    //     console.log('打开电视');
+    //   },
+    //   close: function () {
+    //     console.log('关闭电视');
+    //   },
+    // };
+    // // 命令对象-执行某些特定事情的指令
+    // var OpenTvCommand = function (receiver) {
+    //   var execute = function () {
+    //     return receiver.open();
+    //   };
+    //   var undo = function () {
+    //     return receiver.close();
+    //   };
+
+    //   return {
+    //     execute,
+    //     undo,
+    //   };
+    // };
+
+    // var setCommand = function (command) {
+    //   // 命令发起者
+    //   document.getElementById('execute').onclick = function () {
+    //     command.execute();
+    //   };
+    //   document.getElementById('undo').onclick = function () {
+    //     command.undo();
+    //   };
+    // };
+    // // 往命令对象中植入命令接收者
+    // setCommand(OpenTvCommand(Tv));
+
+
+  // ***************面向对象方式实现命令模式*********************
+    // 命令接收者Tv
+    // var Tv = {
+    //   open: function() {
+    //     console.log('打开电视')
+    //   },
+    //   close: function() {
+    //     console.log('关闭电视')
+    //   }
+    // }
+    // // 命令对象
+    // var OpenTvCommand = function(receiver) {
+    //   this.receiver = receiver;
+    // }
+    // OpenTvCommand.prototype.execute = function() {
+    //   this.receiver.open();
+    // }
+    // OpenTvCommand.prototype.undo = function() {
+    //   this.receiver.close();
+    // }
+
+    // var setCommand = function(command) {
+    //   // 命令发起者
+    //   document.getElementById('execute').onclick = function() {
+    //     command.execute();
+    //   }
+    //   document.getElementById('undo').onclick = function() {
+    //     command.undo();
+    //   }
+    // }
+    // // 往命令对象中植入命令接收者
+    // setCommand(new OpenTvCommand(Tv))
+
+
+  // ***************面向对象和闭包小实例*********************
+    //  var mult = function() {
+    //    var a = 1;
+    //    for(var i =0; i< arguments.length;i++) {
+    //      a = a * arguments[i]
+    //    }
+    //    return a;
+    //  }
+    //  console.log(mult(1,2,3,4), 'xxx')
+
+    // var cache = {}
+    // var mult = function() {
+    //   var a = 1;
+    //   var key = Array.prototype.join.call(arguments, '');
+    //   if (cache[key]) return cache[key]
+    //   for(var i = 0; i < arguments.length; i++) {
+    //     a = a * arguments[i]
+    //   }
+    //   return cache[key] = a
+    // }
+
+    // var mult = (function () {
+    //   var cache = {};
+    //   return function () {
+    //     var key = Array.prototype.join.call(arguments, '');
+    //     if (cache[key]) return cache[key]
+
+    //     var calculate = function () {
+    //       var a = 1;
+    //       for (var i = 0; i < arguments.length; i++) {
+    //         a = a * arguments[i]
+    //       }
+    //       return a;
+    //     }
+
+    //     return cache[key] = calculate.apply(null, arguments)
+    //   }
+    // })()
+    // console.log(mult(1, 2, 3, 4), 'xxx')
+
+    // var Extent = function() {
+    //   var value = 0;
+    //   return {
+    //     call: function() {
+    //       value++;
+    //       console.log(value)
+    //     }
+    //   }
+    // }
+    // var extent = Extent();
+    // extent.call();
+    // extent.call();
+    // extent.call();
+
+    // var extent = {
+    //   value: 0,
+    //   call: function() {
+    //     this.value++;
+    //     console.log(this.value)
+    //   }
+    // }
+    // extent.call();
+    // extent.call();
+
+    // var Extent = function() {
+    //   this.value = 0;
+    // }
+    // Extent.prototype.call = function() {
+    //   this.value++;
+    //   console.log(this.value)
+    // }
+    // var extent = new Extent();
+    // extent.call()
+    // extent.call();
+    // extent.call();
+    // extent.call();
+</script>
+
+</html>
