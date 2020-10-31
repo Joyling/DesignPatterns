@@ -9,6 +9,39 @@
 
 <body>
     <script>
+        // 高阶函数是指至少满足下列条件之一的函数
+        // 1函数可以作为参数被传递
+        // 2函数可以作为返回值输出
+
+
+        // 高阶函数实现AOP
+        Function.prototype.before = function(beforefn) {
+            var __self = this; // 保存原函数的引用
+            return function() { // 返回了包含了原函数和函数的“代理”函数
+                beforefn.apply(this, arguments); // 执行新函数，修正 this
+                return  __self.apply(this,arguments); // 执行原函数
+            }
+        } 
+        Function.prototype.after = function(afterfn) {
+            var __self = this;
+            return function() {
+                var ret =  __self.apply(this, arguments);
+                afterfn.apply(this, arguments)
+                return ret;
+            }
+        }
+
+        var func = function() {
+            console.log(2)
+        }
+        func = func.before(function() {
+            console.log(1)
+        }).after(function() {
+            console.log(3)
+        }) 
+        func();
+
+        // 把负责打印数字1和打印数字3的两个函数通过AOP的方式动态植入func函数
         // 函数柯里化
         var currying = function (fn) {
             var args = [];

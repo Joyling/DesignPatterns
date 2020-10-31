@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闭包</title>
+</head>
+<body>
+    <script>
+
+        // ********* 1、变量的作用域 ***********
+        var func = function() {
+            var a = 1;
+            alert(a); // 输出1
+        }
+        func();
+        alert(a); // 输出： uncaught referenceerror: a is not defined
+
+        // 嵌套函数
+        var a = 1;
+        var func1 = function() {
+            var b = 2;
+            var func2 = function() {
+                var c = 3;
+                alert(b); // 输出：2
+                alert(a); // 输出： 1
+            }
+            func2();
+            alert(c); // 输出：Uncaught ReferenceError: c is not defined
+        }
+        func1();
+
+        // **************2.变量的生存周期********************
+        var func = function() {
+            var a = 1; // 退出函数后局部变量a将被销毁
+            alert(a);
+        };
+        func();
+
+
+        var func =  function() {
+            var a = 1;
+            return function() {
+                a++;
+                alert(a);
+            }
+        }
+        var f = func();
+        f(); // 输出2
+        f(); // 输出3
+        f(); // 输出4
+        // 退出函数后，局部变量a并没有消失，局部变量的生命看起来被延续了
+        // 在执行var f = func();时， f返回了一个匿名函数的引用，它可以访问到func()被调用时产生的环境，而局部变量a一直处在这个环境里。
+        // 既然局部变量所在的环境还能被外界访问，这个局部变量就有了不被销毁的理由
+         // ***************面向对象和闭包小实例*********************
+     var mult = function() {
+       var a = 1;
+       for(var i =0; i< arguments.length;i++) {
+         a = a * arguments[i]
+       }
+       return a;
+     }
+     console.log(mult(1,2,3,4), 'xxx')
+
+    var cache = {}
+    var mult = function() {
+      var a = 1;
+      var key = Array.prototype.join.call(arguments, '');
+      if (cache[key]) return cache[key]
+      for(var i = 0; i < arguments.length; i++) {
+        a = a * arguments[i]
+      }
+      return cache[key] = a
+    }
+
+    var mult = (function () {
+      var cache = {};
+      return function () {
+        var key = Array.prototype.join.call(arguments, '');
+        if (cache[key]) return cache[key]
+
+        var calculate = function () {
+          var a = 1;
+          for (var i = 0; i < arguments.length; i++) {
+            a = a * arguments[i]
+          }
+          return a;
+        }
+
+        return cache[key] = calculate.apply(null, arguments)
+      }
+    })()
+    console.log(mult(1, 2, 3, 4), 'xxx')
+
+    var Extent = function() {
+      var value = 0;
+      return {
+        call: function() {
+          value++;
+          console.log(value)
+        }
+      }
+    }
+    var extent = Extent();
+    extent.call();
+    extent.call();
+    extent.call();
+
+    var extent = {
+      value: 0,
+      call: function() {
+        this.value++;
+        console.log(this.value)
+      }
+    }
+    extent.call();
+    extent.call();
+
+    var Extent = function() {
+      this.value = 0;
+    }
+    Extent.prototype.call = function() {
+      this.value++;
+      console.log(this.value)
+    }
+    var extent = new Extent();
+    extent.call()
+    extent.call();
+    extent.call();
+    extent.call();
+
+    </script>
+</body>
+</html>
