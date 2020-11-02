@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Object-Oriented OO</title>
+</head>
+
+<body>
+  <script>
+    var person = new Object();
+    person.name = 'Mick';
+    person.age = 29;
+    person.job = 'teacher';
+
+    person.sayName = function () {
+      console.log(this.name)
+    }
+
+    // 对象字面量语法
+    var person = {
+      name: 'Mick',
+      age: 29,
+      job: 'Software Engineer',
+      sayName: function () {
+        alert(this.name)
+      }
+    }
+
+
+    // 工厂模式
+    // 解决了创建多个相似对象的问题
+    // 但却没有解决对象识别的问题（即怎么知道一个对象的类型）
+    function createPerson(name, age, job) {
+      var obj = new Object();
+      obj.name = name;
+      obj.age = age;
+      obj.job = job;
+      obj.sayName = function () {
+        alert(obj.name)
+      }
+      return obj
+    }
+    var person1 = new createPerson('张三', 2, '程序员');
+    var person1 = new createPerson('李四', 3, '厨师');
+
+    // 构造函数模式
+    /*
+      1、没有显示地创建对象
+      2、直接将属性和方法赋给了this对象
+      3、没有return语句
+    */
+    /*
+     要创建Person的新实例，必须使用new操作符
+     new会经历以下4个步骤
+     1、创建一个新对象；
+     2、将构造函数的作用域赋值给新对象（因此this就指向了这个新对象）
+     3、执行构造函数中的代码（为这个新对象添加属性）
+     4、返回新对象
+    */
+    function Person(name, age, job) {
+      this.name = name;
+      this.age = age;
+      this.job = job;
+      this.sayName = function () {
+        alert(this.name)
+      }
+    }
+    var person1 = new createPerson('张三', 2, '程序员');
+    var person1 = new createPerson('李四', 3, '厨师');
+
+    // 模拟new
+    function objectFactory() {
+
+      var obj = new Object(),
+
+        Constructor = [].shift.call(arguments);
+
+      obj.__proto__ = Constructor.prototype;
+
+      var ret = Constructor.apply(obj, arguments);
+
+      return typeof ret === 'object' ? ret : obj;
+
+    };
+
+    // 原型模式
+    function Person() {}
+    Person.prototype.name = '张三';
+    Person.prototype.job = '程序员';
+    Person.prototype.age = 23;
+    Person.prototype.sayName = function() {
+      alert(this.name)
+    }
+    var person1 = new Person();
+    person1.sayName();
+    var person2 = new Person();
+    person2.sayName();
+    alert(person1.sayName === person2.sayName)
+
+    alert(Person.prototype.isPrototypeOf(person1));
+    alert(Person.prototype.isPrototypeOf(person2));
+
+    alert(Object.getPrototypeOf(person1) == Person.prototype);
+    alert(Object.getPrototypeOf(person1).name)
+
+    person1.name = '我的名字来自实例';
+    alert(person1.hasOwnPropery('name'));
+    alert(person2.hasOwnPropery('name'));
+    // in操作符只要通过对象能够访问到属性就返回true
+    function hasPrototypeProperty(object, name) {
+      return !object.hasPrototypeProperty(name) && (name in object)
+    }
+    /*
+    1、只要创建了一个新函数，就会根据一组特定的规则为该函数创建一个prototype属性，这个属性指向函数的原型对象
+    2、在默认情况下，所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针
+    Person.prototyp.constructor === Person
+    */
+
+
+    // 原型的动态性
+    var friend = new Person();
+    Person.prototype.sayHi = function() {
+      alert('hi')
+    };
+    friend.sayHi(); // "hi"
+
+    /*尽管可以随时为原型添加属性和方法，并且修改能够立即在所有对象实例中反映出来，
+    但如果是重写整个原型对象，那么情况就不一样了*/
+    function Person() {};
+    var friend = new Person();
+    Person.prototype = {
+      constructor: Person,
+      name: 'xx',
+      age: 23,
+      sayName: function() {
+        alert(this.name)
+      }
+    }
+    friend.sayName(); // error
+
+    // 原型对象的问题
+    // 1、它省略了为构造函数传递初始化参数这一环节，结果所有实例在默认情况下都将取得相同的属性值
+    // 2、原型模式的最大问题是由其共享的本性所导致的。
+
+    // 组合使用构造函数模式和原型模式
+    function Person(name, age, job) {
+      this.name = name;
+      this.age = age;
+      this.job = job;
+      this.friends = ['a', 'b'];
+    }
+    Person.prototype = {
+      constructor: Person,
+      sayName: function() {
+        alert(this.name)
+      }
+    }
+    var person1 = new Person('ss', 123, 'dddd');
+    var person2 = new Person('xx', 33, 'dd');
+    person1.friends.push('c');
+    alert(person1.friends); // a, b, c
+    alert(person2.friends); // a,b
+    alert(person1.friends === person2.friends); // false;
+    alert(person1.sayName === person1.sayName); // true
+
+    // 寄生构造函数模式
+    // 稳妥构造函数模式
+  </script>
+</body>
+
+</html>
